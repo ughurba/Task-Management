@@ -6,8 +6,8 @@ interface initialStateTypes {
 const initialState: initialStateTypes = {
   user: {},
 };
-const userSlice = createSlice({
-  name: "userSlice",
+const userSlices = createSlice({
+  name: "userSlices",
   initialState,
   reducers: {
     authUser: (state, action: PayloadAction<Record<string, string>>) => {
@@ -16,5 +16,4 @@ const userSlice = createSlice({
     logoutUser: (state) => {},
   },
 });
-export const { actions: userActions } = userSlice;
-export default userSlice.reducer;
+export const { actions: userActions, reducer: userSlice } = userSlices;

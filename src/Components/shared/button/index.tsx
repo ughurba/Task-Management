@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 interface Props {
   text: string;
+  onClick?: () => void;
 }
 export const StyledButton = styled.button`
   background: ${({ theme }) => theme.colors.mainPurple};
@@ -13,6 +14,6 @@ export const StyledButton = styled.button`
   border: none;
   color: ${({ theme }) => theme.colors.white}; ;
 `;
-export const Button: FC<Props> = ({ text }) => {
-  return <StyledButton>{text}</StyledButton>;
+export const Button: FC<Props> = ({ text, onClick }) => {
+  return <StyledButton onClick={onClick}>{text}</StyledButton>;
 };

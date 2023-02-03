@@ -1,5 +1,5 @@
 import { Restangle } from "Assets";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createBoard, getAllBoard } from "Services/board";
 import { ICreateBoardDto, IGetAllBoardDto } from "Dtos/boardDtos";
 import { Links } from "Routes/links";
@@ -20,6 +20,7 @@ import {
   Title,
 } from "./styled";
 import { Field } from "Components/shared/field";
+import { ConfigProps, CustomForm } from "Components/shared/form";
 
 export const SideBar = () => {
   const [boards, setBoards] = useState<IGetAllBoardDto[]>([]);
@@ -39,9 +40,44 @@ export const SideBar = () => {
       setOpenModal(false);
     }
   };
-
+  const handleSubmit = (values: any) => {
+    fetchCreateBoard(values);
+  };
   useEffect(() => {
     fetchGetBoards();
+  }, []);
+
+  const initialValue = useMemo(
+    () => ({
+      title: "",
+      columns: [],
+    }),
+    []
+  );
+  const config: Partial<ConfigProps> = useMemo(() => {
+    return {
+      description: {
+        item: {
+          hidden: true,
+        },
+      },
+
+      arrayField: {
+        renderColumns: true,
+      },
+
+      title: {
+        item: {
+          name: "title",
+          label: "Name",
+        },
+      },
+      status: {
+        element: {
+          hidden: true,
+        },
+      },
+    };
   }, []);
 
   return (
@@ -69,45 +105,11 @@ export const SideBar = () => {
             handleCloseModal={handleCloseModal}
             openModal={openModal}
           >
-            <Formik
-              enableReinitialize
-              initialValues={{
-                title: "",
-                columns: [],
-              }}
-              onSubmit={(values: ICreateBoardDto) => {
-                fetchCreateBoard(values);
-              }}
-            >
-              {({ values }) => (
-                <Form>
-                  <Field name={"title"} label="Name" />
-                  <span>columns</span>
-                  <FieldArray
-                    name="columns"
-                    render={(arrayHelpers) => (
-                      <div>
-                        {values.columns.map((col, i) => (
-                          <Flex AlItems="center" key={i}>
-                            <Field name={`columns[${i}]`} />
-                            <button onClick={() => arrayHelpers.remove(i)}>
-                              X
-                            </button>
-                          </Flex>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => arrayHelpers.push("")}
-                        >
-                          Add new Column
-                        </button>
-                      </div>
-                    )}
-                  />
-                  <button type="submit">Create board</button>
-                </Form>
-              )}
-            </Formik>
+            <CustomForm
+              initialValue={initialValue}
+              onSubmit={handleSubmit}
+              config={config}
+            />
           </CustomModal>
         </Boards>
       </Content>

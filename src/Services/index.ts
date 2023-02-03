@@ -14,4 +14,10 @@ http.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+http.interceptors.response.use(undefined, (err) => {
+  const error = err.response;
+  // if (error.status === 401) {
+  //   localStorage.removeItem("userToken");
+  // }
+});
 export { http };

@@ -3,11 +3,12 @@ import { IGetColumnsDto } from "Dtos/columnDtos";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getColumns, postColumn } from "Services/coulmn";
+import { useAppDispatch, useAppSelector } from "Store/hooks";
 import styled from "styled-components";
 import { Column } from "./components/column";
 import { ColumnForm } from "./components/column/components/form";
 import { EmptyBoard } from "./components/emptyBoard";
-
+import { columnActions } from "Store/slices/columnSlice";
 export const Wrapper = styled.section`
   /* display: flex;
   justify-content: center;
@@ -44,15 +45,15 @@ export const WrapperButton = styled.div`
 `;
 const Home = () => {
   const { id } = useParams<{ id: string }>();
-  const [columns, setColumns] = useState<IGetColumnsDto[]>();
   const [openModal, setOpenModal] = useState(false);
-
+  const dispatch = useAppDispatch();
+  const { column } = useAppSelector((state) => state.coulmns);
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
   const fetchColumns = async (id: string) => {
     const { data } = await getColumns(id);
-    setColumns(data);
+    dispatch(columnActions.setColumn(data));
   };
 
   const fetchCreateColumn = async (values: { title: string }) => {
@@ -75,9 +76,9 @@ const Home = () => {
   }, [id]);
   return (
     <Wrapper>
-      <Content>{columns?.length === 0 && <EmptyBoard />}</Content>
+      <Content>{column?.length === 0 && <EmptyBoard />}</Content>
       <Grid container>
-        {columns?.map((x) => (
+        {column?.map((x) => (
           <Column key={x.id} column={x} />
         ))}
         <Grid item>

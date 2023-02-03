@@ -23,7 +23,7 @@ export const Column: FC<Props> = ({ column }) => {
       </Content>
       <div>
         {column.tasks?.map((task) => (
-          <Task task={task} />
+          <Task key={task.id} task={task} />
         ))}
       </div>
     </Grid>
