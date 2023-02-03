@@ -1,11 +1,10 @@
 import { Restangle } from "Assets";
 import { useEffect, useMemo, useState } from "react";
-import { createBoard, getAllBoard } from "Services/board";
-import { ICreateBoardDto, IGetAllBoardDto } from "Dtos/boardDtos";
+import { createBoard } from "Services/board";
+import { ICreateBoardDto } from "Dtos/boardDtos";
 import { Links } from "Routes/links";
 import { CustomModal } from "Components/shared/modal";
-import { FieldArray, Form, Formik } from "formik";
-import { Flex } from "Components/shared/flex";
+
 import {
   Wrapper,
   Boards,
@@ -19,41 +18,30 @@ import {
   Text,
   Title,
 } from "./styled";
-import { Field } from "Components/shared/field";
 import { ConfigProps, CustomForm } from "Components/shared/form";
+import { useAppDispatch, useAppSelector } from "Store/hooks";
+import { fetchBoards } from "Store/slices/boardSlice";
 
 export const SideBar = () => {
-  const [boards, setBoards] = useState<IGetAllBoardDto[]>([]);
   const [openModal, setOpenModal] = useState(false);
+  const { board } = useAppSelector((state) => state.boards);
+  const dispatch = useAppDispatch();
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  const fetchGetBoards = async () => {
-    const { data } = await getAllBoard();
-    setBoards(data);
-  };
-  const fetchCreateBoard = async (values: ICreateBoardDto) => {
+  const handleCreateBoard = async (values: ICreateBoardDto) => {
     const { status } = await createBoard(values);
     if (status === 200) {
-      fetchGetBoards();
+      dispatch(fetchBoards());
       setOpenModal(false);
     }
   };
-  const handleSubmit = (values: any) => {
-    fetchCreateBoard(values);
-  };
+
   useEffect(() => {
-    fetchGetBoards();
+    dispatch(fetchBoards());
   }, []);
 
-  const initialValue = useMemo(
-    () => ({
-      title: "",
-      columns: [],
-    }),
-    []
-  );
   const config: Partial<ConfigProps> = useMemo(() => {
     return {
       description: {
@@ -63,7 +51,8 @@ export const SideBar = () => {
       },
 
       arrayField: {
-        renderColumns: true,
+        // renderColumns: true,
+        // isActive: true,
       },
 
       title: {
@@ -92,7 +81,7 @@ export const SideBar = () => {
         <Boards>
           <Title>ALL BOARDS (3)</Title>
           <List>
-            {boards.map((item) => (
+            {board.map((item) => (
               <StyledLink key={item.id} to={`${Links.app.home}/${item.id}`}>
                 <StyledButton>{item.title}</StyledButton>
               </StyledLink>
@@ -106,8 +95,11 @@ export const SideBar = () => {
             openModal={openModal}
           >
             <CustomForm
-              initialValue={initialValue}
-              onSubmit={handleSubmit}
+              initialValue={{
+                title: "",
+                columns: [],
+              }}
+              onSubmit={handleCreateBoard}
               config={config}
             />
           </CustomModal>

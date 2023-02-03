@@ -13,12 +13,13 @@ interface ItemShape {
 }
 interface ArrayFieldProps {
   renderColumns: boolean;
+  isActive: boolean;
 }
 export interface ConfigProps {
   formik: ItemShape;
   title: ItemShape;
   description: ItemShape;
-  arrayField: ArrayFieldProps;
+  arrayField: Partial<ArrayFieldProps>;
   status: ItemShape;
   render: JSX.Element[];
 }
@@ -29,8 +30,17 @@ interface Props {
   config?: Partial<ConfigProps>;
 }
 
-export const CustomForm: FC<Props> = ({ initialValue, onSubmit, config }) => {
-  const { column } = useAppSelector((state) => state.coulmns);
+export const CustomForm: FC<Props> = ({
+  initialValue,
+  onSubmit,
+  config = {
+    arrayField: {
+      isActive: true,
+    },
+  },
+}) => {
+  const { column } = useAppSelector((state) => state.columns);
+
   return (
     <DynamicCard
       initialValue={initialValue}
@@ -45,50 +55,62 @@ export const CustomForm: FC<Props> = ({ initialValue, onSubmit, config }) => {
             label="Description"
             {...config?.description?.item}
           />
-          {config?.arrayField?.renderColumns ? (
-            <div>
-              <span>Columns</span>
-              <FieldArray
-                name="columns"
-                render={(arrayHelpers) => (
-                  <div>
-                    {props?.values?.columns?.map((col: any, i: number) => (
-                      <Flex AlItems="center" key={i}>
-                        <Field name={`columns[${i}]`} />
-                        <button onClick={() => arrayHelpers.remove(i)}>
-                          X
+          {config?.arrayField?.isActive && (
+            <>
+              {config?.arrayField?.renderColumns ? (
+                <div>
+                  <span>Columns</span>
+                  <FieldArray
+                    name="columns"
+                    render={(arrayHelpers) => (
+                      <div>
+                        {props?.values?.columns?.map((col: any, i: number) => (
+                          <Flex AlItems="center" key={i}>
+                            <Field name={`columns[${i}]`} />
+                            <button onClick={() => arrayHelpers.remove(i)}>
+                              X
+                            </button>
+                          </Flex>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => arrayHelpers.push("")}
+                        >
+                          Add new Column
                         </button>
-                      </Flex>
-                    ))}
-                    <button type="button" onClick={() => arrayHelpers.push("")}>
-                      Add new Column
-                    </button>
-                  </div>
-                )}
-              />
-            </div>
-          ) : (
-            <div>
-              <span>Subtasks</span>
-              <FieldArray
-                name="subTasks"
-                render={(arrayHelpers) => (
-                  <div>
-                    {props?.values?.subTasks?.map((task: any, i: number) => (
-                      <Flex AlItems="center" key={i}>
-                        <Field name={`subTasks[${i}]`} />
-                        <button onClick={() => arrayHelpers.remove(i)}>
-                          X
+                      </div>
+                    )}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <span>Subtasks</span>
+                  <FieldArray
+                    name="subTasks"
+                    render={(arrayHelpers) => (
+                      <div>
+                        {props?.values?.subTasks?.map(
+                          (task: any, i: number) => (
+                            <Flex AlItems="center" key={i}>
+                              <Field name={`subTasks[${i}]`} />
+                              <button onClick={() => arrayHelpers.remove(i)}>
+                                X
+                              </button>
+                            </Flex>
+                          )
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => arrayHelpers.push("")}
+                        >
+                          Add
                         </button>
-                      </Flex>
-                    ))}
-                    <button type="button" onClick={() => arrayHelpers.push("")}>
-                      Add
-                    </button>
-                  </div>
-                )}
-              />
-            </div>
+                      </div>
+                    )}
+                  />
+                </div>
+              )}
+            </>
           )}
 
           <div {...config?.status?.element}>
@@ -96,7 +118,7 @@ export const CustomForm: FC<Props> = ({ initialValue, onSubmit, config }) => {
               select
               style={{ width: "200px", marginTop: "29px" }}
               variant="outlined"
-              name="status"
+              name="columnId"
               label={"Status"}
               value={props?.values?.status}
               onChange={props?.handleChange}

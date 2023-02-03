@@ -1,36 +1,30 @@
 import { Button } from "Components/shared/button";
 import { Flex } from "Components/shared/flex";
 import { useSetUser } from "Hooks/useSetUser";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Links } from "Routes/links";
-import styled from "styled-components";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { styled as MuiStyled } from "@mui/material";
 import { CustomModal } from "Components/shared/modal";
-import { CustomForm, ConfigProps } from "Components/shared/form";
-import { Field, FieldArray } from "formik";
+import { CustomForm } from "Components/shared/form";
+import { createTask } from "Services/task";
+import { ICreateTaskDto } from "Dtos/createTaskDtos";
+import { fetchColumns } from "Store/slices/columnSlice";
+import { useAppDispatch } from "Store/hooks";
+import BasicPopover, { ButtonsConfigProps } from "Components/shared/popover";
+import { removeBoard } from "Services/board";
+import { fetchBoards } from "Store/slices/boardSlice";
+import { StyledToolbar, Title } from "./styled";
 
-export const Wrapper = styled.div``;
-export const StyledHeader = styled.header``;
-export const Text = styled.p``;
-export const Title = styled.h2``;
-export const StyledToolbar = MuiStyled(Toolbar)`
-justify-content:space-between;
-background:white;
-color:black;
-`;
 export const Header = () => {
-  const navigate = useNavigate();
-
+  const { id } = useParams<{ id: string }>();
   const [openModal, setOpenModal] = useState(false);
-
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useSetUser();
   useEffect(() => {
@@ -40,33 +34,72 @@ export const Header = () => {
     }
   }, []);
 
-  const initialValue = useMemo(
-    () => ({
-      title: "",
-      description: "",
-      status: 0,
-      subTasks: [],
-    }),
-    []
-  );
-  const handleSubmit = (values: typeof initialValue) => {
-    console.log(values);
+  const handleCreateTask = async (values: ICreateTaskDto) => {
+    const { status } = await createTask(values);
+
+    if (status === 200) {
+      if (id) {
+        dispatch(fetchColumns(id));
+        setOpenModal(false);
+      }
+    }
   };
+
+  const handleRemoveBoard = useCallback(async () => {
+    if (id) {
+      const { status } = await removeBoard(id);
+      if (status === 200) {
+        dispatch(fetchBoards());
+        navigate(Links.app.base);
+        setAnchorEl(null);
+      }
+    }
+  }, [dispatch, id, navigate]);
+
+  const handleClosePopover = useCallback(() => setAnchorEl(null), []);
+
+  const buttonsConfig: ButtonsConfigProps = useMemo(() => {
+    return {
+      deleteText: "Delete Board",
+      editText: "Edit Board",
+      onDeleteClick: handleRemoveBoard,
+    };
+  }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <StyledToolbar>
           <Title>Platform Launch</Title>
           <Flex AlItems="center">
-            <Button onClick={handleOpenModal} text="+Add New Task" />
-            <IconButton aria-label="settings">
+            <Button onClick={() => setOpenModal(true)} text="+Add New Task" />
+
+            <IconButton
+              onClick={(event) => setAnchorEl(event.currentTarget)}
+              aria-label="settings"
+            >
               <MoreVertIcon />
             </IconButton>
+            <BasicPopover
+              buttonsConfig={buttonsConfig}
+              anchorEl={anchorEl}
+              onClose={handleClosePopover}
+            />
           </Flex>
         </StyledToolbar>
       </AppBar>
-      <CustomModal handleCloseModal={handleCloseModal} openModal={openModal}>
-        <CustomForm initialValue={initialValue} onSubmit={handleSubmit} />
+      <CustomModal
+        handleCloseModal={() => setOpenModal(false)}
+        openModal={openModal}
+      >
+        <CustomForm
+          initialValue={{
+            title: "",
+            description: "",
+            columnId: 0,
+            subTasks: [],
+          }}
+          onSubmit={handleCreateTask}
+        />
       </CustomModal>
     </Box>
   );

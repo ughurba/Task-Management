@@ -1,6 +1,6 @@
 export const Links = {
   app: {
-    main: "/",
+    base: "/",
     home: "",
   },
   auth: {

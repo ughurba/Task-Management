@@ -9,7 +9,7 @@ export const AppRoutes = () => {
     <BrowserRouter>
       <Suspense fallback={<div>loading...</div>}>
         <Routes>
-          <Route path={Links.app.main} element={<AppLayout />}>
+          <Route path={Links.app.base} element={<AppLayout />}>
             <Route path={`${Links.app.home}/:id`} element={<Home />} />
           </Route>
           <Route path={Links.auth.login} element={<Login />} />

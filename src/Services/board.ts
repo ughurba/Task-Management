@@ -12,3 +12,7 @@ export const getAllBoard = () => {
   const res = http.get<IGetAllBoardDto[]>("/board");
   return res;
 };
+export const removeBoard = (boardId: string) => {
+  const res = http.delete(`/board/removeBoard/${boardId}`);
+  return res;
+};
