@@ -23,7 +23,6 @@ const Register = () => {
     },
     onSubmit: async (values) => {
       const data = await postRegister(values);
-      console.log({ data });
     },
   });
 

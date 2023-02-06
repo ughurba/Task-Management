@@ -13,6 +13,6 @@ export const getAllBoard = () => {
   return res;
 };
 export const removeBoard = (boardId: string) => {
-  const res = http.delete(`/board/removeBoard/${boardId}`);
+  const res = http.delete(`/board/removeBoard?boardId=${boardId}`);
   return res;
 };

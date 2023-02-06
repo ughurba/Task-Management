@@ -3,6 +3,7 @@ import { MenuItem, TextField } from "@mui/material";
 import { FieldArray, FormikProps, FormikValues } from "formik";
 import { FC } from "react";
 import { useAppSelector } from "Store/hooks";
+import { ObjectShape, OptionalObjectSchema } from "yup/lib/object";
 import { DynamicCard } from "../dynamicCard";
 import { Field } from "../field";
 import { Flex } from "../flex";
@@ -28,6 +29,8 @@ interface Props {
   initialValue: Record<string, any>;
   onSubmit: (values: any) => void;
   config?: Partial<ConfigProps>;
+  renderButton: JSX.Element;
+  onValidationSchema?: OptionalObjectSchema<ObjectShape>;
 }
 
 export const CustomForm: FC<Props> = ({
@@ -38,6 +41,8 @@ export const CustomForm: FC<Props> = ({
       isActive: true,
     },
   },
+  renderButton,
+  onValidationSchema,
 }) => {
   const { column } = useAppSelector((state) => state.columns);
 
@@ -45,7 +50,7 @@ export const CustomForm: FC<Props> = ({
     <DynamicCard
       initialValue={initialValue}
       onSubmit={onSubmit}
-      {...config?.formik?.item}
+      onValidationSchema={onValidationSchema}
     >
       {(props: FormikProps<FormikValues>) => (
         <>
@@ -112,7 +117,6 @@ export const CustomForm: FC<Props> = ({
               )}
             </>
           )}
-
           <div {...config?.status?.element}>
             <TextField
               select
@@ -135,7 +139,7 @@ export const CustomForm: FC<Props> = ({
               <div key={i}>{x}</div>
             )) as JSX.Element[]
           }
-          <button type="submit">Create board</button>
+          {renderButton}
         </>
       )}
     </DynamicCard>

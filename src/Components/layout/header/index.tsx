@@ -25,7 +25,6 @@ export const Header = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   useSetUser();
   useEffect(() => {
     const token = localStorage.getItem("userToken");
@@ -64,7 +63,8 @@ export const Header = () => {
       editText: "Edit Board",
       onDeleteClick: handleRemoveBoard,
     };
-  }, []);
+  }, [handleRemoveBoard]);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -92,6 +92,7 @@ export const Header = () => {
         openModal={openModal}
       >
         <CustomForm
+          renderButton={<Button text="Create task" type="submit" />}
           initialValue={{
             title: "",
             description: "",
