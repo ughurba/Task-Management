@@ -18,11 +18,20 @@ import BasicPopover, { ButtonsConfigProps } from "Components/shared/popover";
 import { removeBoard } from "Services/board";
 import { fetchBoards } from "Store/slices/boardSlice";
 import { StyledToolbar, Title } from "./styled";
+import { createTaskValidation } from "Helper/validations";
+import { toast } from "react-toastify";
 
 export const Header = () => {
   const { id } = useParams<{ id: string }>();
   const [openModal, setOpenModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [createTaskObject, setCreateTaskObject] = useState<{
+    isLoading?: boolean;
+    error?: string;
+  }>({
+    error: "",
+    isLoading: false,
+  });
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   useSetUser();
@@ -34,13 +43,19 @@ export const Header = () => {
   }, []);
 
   const handleCreateTask = async (values: ICreateTaskDto) => {
-    const { status } = await createTask(values);
+    setCreateTaskObject({ isLoading: true });
+
+    const { status, data } = await createTask(values);
 
     if (status === 200) {
       if (id) {
         dispatch(fetchColumns(id));
         setOpenModal(false);
+        setCreateTaskObject({ isLoading: false });
+        toast.success("task elave olundu");
       }
+    } else if (status === 400) {
+      setCreateTaskObject({ error: data });
     }
   };
 
@@ -91,8 +106,18 @@ export const Header = () => {
         handleCloseModal={() => setOpenModal(false)}
         openModal={openModal}
       >
+        <div>{createTaskObject?.error}</div>
+
         <CustomForm
-          renderButton={<Button text="Create task" type="submit" />}
+          onValidationSchema={createTaskValidation()}
+          renderButton={
+            <Button
+              loading={createTaskObject.isLoading}
+              fullWidth
+              text="Create task"
+              type="submit"
+            />
+          }
           initialValue={{
             title: "",
             description: "",

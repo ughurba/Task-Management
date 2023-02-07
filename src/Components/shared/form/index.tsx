@@ -17,7 +17,6 @@ interface ArrayFieldProps {
   isActive: boolean;
 }
 export interface ConfigProps {
-  formik: ItemShape;
   title: ItemShape;
   description: ItemShape;
   arrayField: Partial<ArrayFieldProps>;
@@ -60,63 +59,68 @@ export const CustomForm: FC<Props> = ({
             label="Description"
             {...config?.description?.item}
           />
-          {config?.arrayField?.isActive && (
-            <>
-              {config?.arrayField?.renderColumns ? (
-                <div>
-                  <span>Columns</span>
-                  <FieldArray
-                    name="columns"
-                    render={(arrayHelpers) => (
-                      <div>
-                        {props?.values?.columns?.map((col: any, i: number) => (
-                          <Flex AlItems="center" key={i}>
-                            <Field name={`columns[${i}]`} />
-                            <button onClick={() => arrayHelpers.remove(i)}>
-                              X
-                            </button>
-                          </Flex>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => arrayHelpers.push("")}
-                        >
-                          Add new Column
-                        </button>
-                      </div>
-                    )}
-                  />
-                </div>
-              ) : (
-                <div>
-                  <span>Subtasks</span>
-                  <FieldArray
-                    name="subTasks"
-                    render={(arrayHelpers) => (
-                      <div>
-                        {props?.values?.subTasks?.map(
-                          (task: any, i: number) => (
-                            <Flex AlItems="center" key={i}>
-                              <Field name={`subTasks[${i}]`} />
-                              <button onClick={() => arrayHelpers.remove(i)}>
-                                X
-                              </button>
-                            </Flex>
-                          )
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => arrayHelpers.push("")}
-                        >
-                          Add
-                        </button>
-                      </div>
-                    )}
-                  />
-                </div>
-              )}
-            </>
-          )}
+          <>
+            {config?.arrayField?.isActive && (
+              <>
+                {config?.arrayField?.renderColumns ? (
+                  <div>
+                    <span>Columns</span>
+                    <FieldArray
+                      name="columns"
+                      render={(arrayHelpers) => (
+                        <div>
+                          {props?.values?.columns?.map(
+                            (col: any, i: number) => (
+                              <Flex AlItems="center" key={i}>
+                                <Field name={`columns[${i}]`} />
+                                <button onClick={() => arrayHelpers.remove(i)}>
+                                  X
+                                </button>
+                              </Flex>
+                            )
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => arrayHelpers.push("")}
+                          >
+                            Add new Column
+                          </button>
+                        </div>
+                      )}
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <span>Subtasks</span>
+                    <FieldArray
+                      name="subTasks"
+                      render={(arrayHelpers) => (
+                        <div>
+                          {props?.values?.subTasks?.map(
+                            (task: any, i: number) => (
+                              <Flex AlItems="center" key={i}>
+                                <Field name={`subTasks[${i}]`} />
+                                <button onClick={() => arrayHelpers.remove(i)}>
+                                  X
+                                </button>
+                              </Flex>
+                            )
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => arrayHelpers.push("")}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      )}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </>
+
           <div {...config?.status?.element}>
             <TextField
               select
@@ -126,6 +130,7 @@ export const CustomForm: FC<Props> = ({
               label={"Status"}
               value={props?.values?.status}
               onChange={props?.handleChange}
+              required
             >
               {column?.map((item) => (
                 <MenuItem key={item?.id} value={item?.id}>
@@ -134,12 +139,14 @@ export const CustomForm: FC<Props> = ({
               ))}
             </TextField>
           </div>
-          {
-            config?.render?.map((x, i) => (
-              <div key={i}>{x}</div>
-            )) as JSX.Element[]
-          }
-          {renderButton}
+          <>
+            {
+              config?.render?.map((x, i) => (
+                <div key={i}>{x}</div>
+              )) as JSX.Element[]
+            }
+          </>
+          <>{renderButton}</>
         </>
       )}
     </DynamicCard>
