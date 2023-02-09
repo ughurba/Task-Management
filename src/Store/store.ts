@@ -3,11 +3,13 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import { columnSlice } from "./slices/columnSlice";
 import { boardSlice } from "./slices/boardSlice";
 import { userSlice } from "./slices/userSlice";
+import { subTaskSlice } from "./slices/subTaskSlice";
 export const store = configureStore({
   reducer: {
     user: userSlice,
     columns: columnSlice,
     boards: boardSlice,
+    subTasks: subTaskSlice,
   },
 });
 

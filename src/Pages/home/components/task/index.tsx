@@ -4,11 +4,11 @@ import { ITask } from "types";
 
 export const Wrapper = styled.div``;
 export const Content = styled.div`
-  background: #ffffff;
+  /* background: #ffffff;
   box-shadow: 0px 4px 6px rgba(54, 78, 126, 0.101545);
   border-radius: 8px;
   padding: 23px 16px 46px 16px;
-  margin-top: 20px;
+  margin-top: 20px; */
 `;
 export const Title = styled.h3`
   font-style: normal;
@@ -38,10 +38,11 @@ interface Props {
 export const Task: FC<Props> = ({ task }) => {
   return (
     <Wrapper>
-      <Content>
-        <Title>{task.title}</Title>
-        <SubTitle>0 of 6 subtasks</SubTitle>
-      </Content>
+      <Title>{task.title}</Title>
+      <SubTitle>
+        {task.subTasks.filter((x) => x.completed).length} of{" "}
+        {task.subTasks.length} subtasks
+      </SubTitle>
     </Wrapper>
   );
 };

@@ -4,6 +4,7 @@ import { FieldArray, FormikProps, FormikValues } from "formik";
 import { FC } from "react";
 import { useAppSelector } from "Store/hooks";
 import { ObjectShape, OptionalObjectSchema } from "yup/lib/object";
+import { Button } from "../button";
 import { DynamicCard } from "../dynamicCard";
 import { Field } from "../field";
 import { Flex } from "../flex";
@@ -106,12 +107,11 @@ export const CustomForm: FC<Props> = ({
                               </Flex>
                             )
                           )}
-                          <button
-                            type="button"
+                          <Button
                             onClick={() => arrayHelpers.push("")}
-                          >
-                            Add
-                          </button>
+                            fullWidth
+                            text="Add subTask"
+                          />
                         </div>
                       )}
                     />

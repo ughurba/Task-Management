@@ -23,7 +23,9 @@ export const fetchColumns = createAsyncThunk(
 const columnSlices = createSlice({
   name: "coulmnSlice",
   initialState,
-  reducers: {},
+  reducers: {
+    updateSubTask: (state, action) => {},
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchColumns.pending, (state) => {

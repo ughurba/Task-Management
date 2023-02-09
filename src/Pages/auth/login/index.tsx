@@ -23,6 +23,7 @@ export default function SignIn() {
       const { data } = await postLogin(values);
       if (data.token) {
         localStorage.setItem("userToken", data.token);
+
         navigate(Links.app.base);
       }
     },

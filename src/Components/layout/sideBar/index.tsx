@@ -25,6 +25,7 @@ import { Status } from "Helper/enums";
 import Loading from "Components/shared/loading";
 import { Button } from "Components/shared/button";
 import { toast } from "react-toastify";
+import { getUserToken } from "Helper/getToken";
 
 export const SideBar = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -55,7 +56,9 @@ export const SideBar = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchBoards());
+    if (getUserToken()) {
+      dispatch(fetchBoards());
+    }
   }, []);
 
   const config: Partial<ConfigProps> = useMemo(() => {
@@ -101,7 +104,7 @@ export const SideBar = () => {
             <>
               <Title>ALL BOARDS ({board.length})</Title>
               <List>
-                {board.map((item) => (
+                {board?.map((item) => (
                   <StyledLink key={item.id} to={`${Links.app.home}/${item.id}`}>
                     <StyledButton>{item.title}</StyledButton>
                   </StyledLink>
