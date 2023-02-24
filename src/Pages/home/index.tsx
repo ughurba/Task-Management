@@ -8,21 +8,26 @@ import { getTask } from "Helper/getTask";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { postColumn } from "Services/coulmn";
-import { useAppDispatch, useAppSelector } from "Store/hooks";
+import { useActionCreators, useAppSelector } from "Store/hooks";
 import { fetchColumns } from "Store/slices/columnSlice";
 import { ITask } from "types";
 import { Column } from "./components/column";
 import { EmptyBoard } from "./components/emptyBoard";
 import { TaskModal } from "./components/taskModal";
 import { Wrapper, Content, StyledButton, WrapperButton } from "./styled";
+import { columnActions } from "Store/slices/columnSlice";
 
+const allColumnActions = {
+  ...columnActions,
+  fetchColumns,
+};
 const Home = () => {
   const { id } = useParams<{ id: string }>();
   const [openModal, setOpenModal] = useState(false);
   const [openTaskModal, setOpenTaskModal] = useState(false);
   const [task, setTask] = useState<ITask>();
+  const columnActions = useActionCreators(allColumnActions);
 
-  const dispatch = useAppDispatch();
   const { column, status } = useAppSelector((state) => state.columns);
 
   const fetchCreateColumn = async (values: { title: string }) => {
@@ -32,7 +37,7 @@ const Home = () => {
     });
     if (status === 200) {
       if (id) {
-        dispatch(fetchColumns(id));
+        columnActions.fetchColumns(id);
         setOpenModal(false);
       }
     }
@@ -44,7 +49,7 @@ const Home = () => {
   };
   useEffect(() => {
     if (id) {
-      dispatch(fetchColumns(id));
+      columnActions.fetchColumns(id);
     }
   }, [id]);
 

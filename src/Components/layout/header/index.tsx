@@ -12,14 +12,22 @@ import { CustomModal } from "Components/shared/modal";
 import { CustomForm } from "Components/shared/form";
 import { createTask } from "Services/task";
 import { ICreateTaskDto } from "Dtos/createTaskDtos";
-import { fetchColumns } from "Store/slices/columnSlice";
-import { useAppDispatch } from "Store/hooks";
+import { fetchColumns, columnActions } from "Store/slices/columnSlice";
+import { useActionCreators, useAppDispatch } from "Store/hooks";
 import BasicPopover, { ButtonsConfigProps } from "Components/shared/popover";
 import { removeBoard } from "Services/board";
-import { fetchBoards } from "Store/slices/boardSlice";
+import { fetchBoards, boardActions } from "Store/slices/boardSlice";
 import { StyledToolbar, Title } from "./styled";
 import { createTaskValidation } from "Helper/validations";
 import { toast } from "react-toastify";
+const allActionsColumn = {
+  ...columnActions,
+  fetchColumns,
+};
+const allActionsBoard = {
+  ...boardActions,
+  fetchBoards,
+};
 
 export const Header = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,7 +41,11 @@ export const Header = () => {
     isLoading: false,
   });
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+
+  const actions = useActionCreators({
+    ...allActionsColumn,
+    ...allActionsBoard,
+  });
   useSetUser();
   useEffect(() => {
     const token = localStorage.getItem("userToken");
@@ -49,7 +61,7 @@ export const Header = () => {
 
     if (status === 200) {
       if (id) {
-        dispatch(fetchColumns(id));
+        actions.fetchColumns(id);
         setOpenModal(false);
         setCreateTaskObject({ isLoading: false });
         toast.success("task elave olundu");
@@ -63,12 +75,12 @@ export const Header = () => {
     if (id) {
       const { status } = await removeBoard(id);
       if (status === 200) {
-        dispatch(fetchBoards());
+        actions.fetchBoards();
         navigate(Links.app.base);
         setAnchorEl(null);
       }
     }
-  }, [dispatch, id, navigate]);
+  }, [id, navigate, actions]);
 
   const handleClosePopover = useCallback(() => setAnchorEl(null), []);
 
